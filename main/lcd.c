@@ -17,7 +17,7 @@ const i2c_port_t i2c_master_port = (i2c_port_t)0;
 
 static void lcd_lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_map)
 {
-    auto panel_handle = (esp_lcd_panel_handle_t) drv->user_data;
+    esp_lcd_panel_handle_t panel_handle = (esp_lcd_panel_handle_t) drv->user_data;
     int offsetx1 = area->x1;
     int offsetx2 = area->x2;
     int offsety1 = area->y1;
@@ -35,8 +35,7 @@ i2c_config_t conf = {
   .scl_io_num = TOUCH_PIN_SCL,
   .sda_pullup_en = GPIO_PULLUP_DISABLE,
   .scl_pullup_en = GPIO_PULLUP_DISABLE,
-  .master
-  {
+  .master = {
     .clk_speed = TOUCH_FREQ_HZ,
   },
   .clk_flags = I2C_SCLK_SRC_FLAG_FOR_NOMAL
@@ -65,7 +64,7 @@ void process_coordinates(esp_lcd_touch_handle_t tp, uint16_t *x, uint16_t *y, ui
 
 void gt911_touch_init(esp_lcd_touch_handle_t *tp)
 {
-esp_lcd_panel_io_handle_t tp_io_handle = nullptr;
+esp_lcd_panel_io_handle_t tp_io_handle = NULL;
 esp_lcd_panel_io_i2c_config_t tp_io_config = ESP_LCD_TOUCH_IO_I2C_GT911_CONFIG();
 const esp_lcd_touch_config_t tp_cfg = {
   .x_max = LCD_H_RES,
@@ -82,7 +81,7 @@ const esp_lcd_touch_config_t tp_cfg = {
       .mirror_y = 0,
   },
   .process_coordinates = process_coordinates, // callback to fix coordinates between gt911 and display
-  .interrupt_callback = nullptr
+  .interrupt_callback = NULL
 };
 
   ESP_ERROR_CHECK(esp_lcd_new_panel_io_i2c((esp_lcd_i2c_bus_handle_t)i2c_master_port, &tp_io_config, &tp_io_handle));
@@ -91,7 +90,7 @@ const esp_lcd_touch_config_t tp_cfg = {
 
 static void gt911_touchpad_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *data)
 {
-  auto tp = (esp_lcd_touch_handle_t)indev_drv->user_data;
+  esp_lcd_touch_handle_t tp = (esp_lcd_touch_handle_t)indev_drv->user_data;
   assert(tp);
 
   uint16_t touchpad_x;
@@ -100,7 +99,7 @@ static void gt911_touchpad_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *data
 
   esp_lcd_touch_read_data(tp);
 
-  bool touchpad_pressed = esp_lcd_touch_get_coordinates(tp, &touchpad_x, &touchpad_y, nullptr, &touchpad_cnt, 1);
+  bool touchpad_pressed = esp_lcd_touch_get_coordinates(tp, &touchpad_x, &touchpad_y, NULL, &touchpad_cnt, 1);
   if (touchpad_pressed && touchpad_cnt > 0)
   {
     data->point.x = touchpad_x;
@@ -129,7 +128,7 @@ static lv_disp_draw_buf_t disp_buf; // contains internal graphic buffer(s) calle
 static lv_disp_drv_t disp_drv;      // contains callback functions
 static lv_indev_drv_t indev_drv_tp;
 esp_lcd_touch_handle_t tp;
-esp_lcd_panel_handle_t panel_handle = nullptr;
+esp_lcd_panel_handle_t panel_handle = NULL;
 gpio_config_t bk_gpio_config = {
   .pin_bit_mask = 1ULL << LCD_PIN_BK_LIGHT,
   .mode         = GPIO_MODE_OUTPUT,
@@ -150,7 +149,7 @@ esp_lcd_rgb_panel_config_t panel_config = {
     .vsync_pulse_width  = 4,
     .vsync_back_porch   = 8,
     .vsync_front_porch  = 8,
-    .flags{
+    .flags = {
       .hsync_idle_low   = false,
       .vsync_idle_low   = false,
       .de_idle_high     = false,
@@ -188,8 +187,7 @@ esp_lcd_rgb_panel_config_t panel_config = {
     LCD_PIN_DATA14,
     LCD_PIN_DATA15
   },
-  .flags
-  {
+  .flags = {
     .disp_active_low      = 0,
     .refresh_on_demand    = 0,
     .fb_in_psram          = true,
@@ -254,7 +252,7 @@ esp_lcd_rgb_panel_config_t panel_config = {
 
   if (lv_indev_drv_register(&indev_drv_tp))
   {
-    xTaskCreate(&lvUpdateTask, "lv_update", 4096, nullptr, tskIDLE_PRIORITY, nullptr);
+    xTaskCreate(&lvUpdateTask, "lv_update", 4096, NULL, tskIDLE_PRIORITY, NULL);
     return ESP_OK;
   }
 

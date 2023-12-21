@@ -22,7 +22,7 @@
 //
 // example lvgl graphics from https://github.com/espressif/esp-bsp/tree/master/examples/display
 //
-extern "C" void example_lvgl_demo_ui(lv_obj_t *scr);
+void example_lvgl_demo_ui(lv_obj_t *scr);
 
 static void touch_event(lv_event_t *e)
 {
@@ -30,15 +30,16 @@ uint8_t n = rand()%0xff;
 
   if (e->code == LV_EVENT_CLICKED)
   {
-    auto *label = (lv_obj_t*)e->user_data;
-    lv_obj_set_style_text_color(label, LV_COLOR_MAKE16(n,n*2,n*3), 0);
+    lv_color_t color = LV_COLOR_MAKE16(n,n*2,n*3);
+    lv_obj_t *label = (lv_obj_t*)e->user_data;
+    lv_obj_set_style_text_color(label, color, 0);
   }
 }
 
 //
 //
 //
-extern "C" void app_main(void)
+void app_main(void)
 {
 uint32_t n = 0;
 char buf[12];
@@ -52,10 +53,14 @@ char buf[12];
   // print a simple counter next to the Espressif demo
   //
   lv_obj_t *scr = lv_disp_get_scr_act(NULL);
-  lv_obj_t *label= lv_label_create(scr);
+  lv_color_t color = LV_COLOR_MAKE16(0xff, 0x00, 0x00);
+  lv_obj_t *label = lv_label_create(scr);
+  lv_obj_t *label2 = lv_label_create(scr);
   lv_obj_align(label, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
-  lv_obj_set_style_text_color(label, LV_COLOR_MAKE16(0xff, 0x00, 0x00), 0);
+  lv_obj_align(label2, LV_ALIGN_TOP_MID, 0, 0);
+  lv_obj_set_style_text_color(label, color, 0);
   lv_label_set_text_static(label, "");
+  lv_label_set_text_static(label2, "Hello world");
 
   //
   // change counter color when the display was clicked
@@ -66,11 +71,6 @@ char buf[12];
   // turn on lcd backlight, to prevent displaying noise
   //
   gpio_set_level(LCD_PIN_BK_LIGHT, LCD_BK_LIGHT_ON_LEVEL);
-
-  //
-  // run the Espressif logo demo
-  //
-  example_lvgl_demo_ui(scr);
 
 
   while(true)
