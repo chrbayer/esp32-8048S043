@@ -72,7 +72,7 @@ const esp_lcd_touch_config_t tp_cfg = {
   .rst_gpio_num = TOUCH_PIN_RESET,
   .int_gpio_num = GPIO_NUM_NC,
   .levels = {
-      .reset = 1,
+      .reset = 0,
       .interrupt = 0,
   },
   .flags = {
@@ -106,7 +106,7 @@ static void gt911_touchpad_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *data
     data->point.y = touchpad_y;
     data->state = LV_INDEV_STATE_PRESSED;
   }
-  else 
+  else
   {
     data->state = LV_INDEV_STATE_RELEASED;
   }
